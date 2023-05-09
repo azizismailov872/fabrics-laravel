@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Response;
 
 class LoginRequest extends FormRequest
 {
@@ -19,6 +21,23 @@ class LoginRequest extends FormRequest
         return true;
     }
 
+    protected function failedValidation(Validator $validator)
+    {   
+        if($validator->fails()){
+            $errorsList =[];
+
+            foreach($validator->errors()->keys() as $key => $value)
+            {
+                if($value){
+                    $errorsList[$value]['message'] = $validator->errors()->first($value);
+                }
+            }
+
+            throw new ValidationException($validator, Response::json($errorsList,422));
+        }
+       
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -27,8 +46,18 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => 'required|exists:users',
+            'password' => 'required|string|min:8'
+        ];
+    }
+
+    public function messages()
+    {
+        return[
+            'email.required' => 'Поле email обязательно к заполнению',
+            'email.exists' => 'Такого пользователя не существует',
+            'password.required' => 'Поле пароль обязательно к заполнению',
+            'password.min' => 'Слишком короткий пароль'
         ];
     }
 
@@ -37,17 +66,10 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate()
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
 
         RateLimiter::clear($this->throttleKey());
     }
