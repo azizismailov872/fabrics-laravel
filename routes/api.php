@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Colors\ColorsController;
+use App\Http\Controllers\Fabrics\FabricsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -19,15 +22,24 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/auth',function(){
-    if(Auth::check()) {
-        return response()->json([
-            'auth' =>  Auth::check(),
-            'user' => Auth::user()
-        ],200);
-    }
+Route::get('/auth',[AuthenticatedSessionController::class,'auth']);
 
-    return response()->json([
-        'auth' =>  Auth::check()
-    ],200);
+
+Route::controller(FabricsController::class)->group(function(){
+    Route::get('/fabrics','get');
+    Route::get('/fabrics/{id}','one');
+    Route::post('/fabrics/create','create');
+    Route::post('/fabrics/update/{id}','update');
+    Route::get('/fabrics/delete/{id}','delete');
+    Route::post('/fabrics/delete','destroy');
+});
+
+Route::controller(ColorsController::class)->group(function(){
+    Route::get('/colors','get');
+    Route::get('/colors/list','list');
+    Route::get('/colors/{id}','one');
+    Route::post('/colors/create','create');
+    Route::post('/colors/update/{id}','update');
+    Route::get('/colors/delete/{id}','delete');
+    Route::post('/colors/delete','destroy');
 });
