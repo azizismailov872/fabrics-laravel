@@ -11,9 +11,7 @@ class FabricsRepository {
 
     public function one($id, $withColors = false)
     {   
-        return $withColors ? Fabric::with(['colors' => function($query){
-            return $query->select('name');
-        }])->find($id) : Fabric::find($id);
+        return $withColors ? Fabric::with('colors')->find($id) : Fabric::find($id);
     }
 
     public function get($sortBy = 'created_at',$sort = 'desc',$pageSize = 30,$filters = null)
@@ -58,21 +56,21 @@ class FabricsRepository {
         return (isset($fabric) && !empty($fabric)) ? $fabric : null;
     }
 
-    public function update($id,$updatedData)
+    public function update($id,$data)
     {
         $fabric = Fabric::find($id);
 
         if(!$fabric) return null;
-
-        if(isset($updatedData['colors']) && !empty($updatedData['colors'])) {
-            $fabric->colors()->attach($updatedData['colors']);
+        
+        if(isset($data['colors']) && !empty($data['colors'])) {
+            $fabric->colors()->sync($data['colors']);
         }
 
         if(empty($data['colors'])) {
             $fabric->colors()->detach();
         }
 
-        return $fabric->update($updatedData);
+        return $fabric->update($data);
     }
 
     public function delete($id)
