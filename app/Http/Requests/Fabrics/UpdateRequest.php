@@ -28,7 +28,7 @@ class UpdateRequest extends FormRequest
         return [
             'model' => 'required|max:300|unique:fabrics,model,'.$this->id,
             'quantity' => 'required|integer|min:0',
-            'materials' => 'sometimes|string|max:1500',
+            'materials' => 'sometimes|string|max:1500|nullable',
             'colors' => 'sometimes|array|exists:colors,id'
         ];
     }
