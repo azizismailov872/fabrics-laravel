@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Colors;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Colors\CreateRequest;
 use App\Http\Requests\Colors\FilterRequest;
 use App\Http\Requests\Colors\UpdateRequest;
 use App\Repositories\Colors\ColorsRepository;
-use Illuminate\Http\Request;
 
 class ColorsController extends Controller
 {   
@@ -31,7 +31,7 @@ class ColorsController extends Controller
             'last_page' => $colors->lastPage(),
             'from' => $colors->firstItem(),
             'to' => $colors->lastItem(),
-        ])->setStatusCode(200);
+        ],200);
         
     }
 
@@ -43,11 +43,11 @@ class ColorsController extends Controller
             'status' => 1,
             'message' => 'Данные успешно получены',
             'data' => $fabric
-        ])->setStatusCode(201) : response()->json([
+        ],200) : response()->json([
             'status' => 0,
-            'message' => 'Данные не были найдены',
+            'message' => 'Такой цвет не был найден',
             'data' => $fabric
-        ])->setStatusCode(404);
+        ],404);
     }
 
     public function list(ColorsRepository $repository) 
@@ -58,7 +58,7 @@ class ColorsController extends Controller
             "status" => 1,
             'message' => 'Данные успешно получены',
             'data' => $list
-        ]);
+        ],200);
     }
 
     public function create(CreateRequest $request, ColorsRepository $repository)
@@ -70,10 +70,10 @@ class ColorsController extends Controller
         return isset($color) ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно сохранены'
-        ]) : response()->json([
+        ],201) : response()->json([
             "status" => 0,
             'message' => 'Ошибка, данные не были сохранены'
-        ]);
+        ],500);
     }
 
     public function update(UpdateRequest $request, ColorsRepository $repository,$id)
@@ -82,28 +82,42 @@ class ColorsController extends Controller
 
         $response = $repository->update($id,$data);
 
+        if(is_null($response))
+        {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Такой цвет не был найден'
+            ],404);
+        }
+
         return $response ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно обновлены'
-        ])->setStatusCode(200) : response()->json([
+        ],200) : response()->json([
             'status' => 0,
             'message' => 'Ошибка, данные не были обновлены'
-        ])->setStatusCode(500);
+        ],500);
     }  
 
     public function delete(ColorsRepository $repository, $id)
     {
         $response = $repository->delete($id);
 
-        if(is_array($response)) return response()->json($response);
+        if(is_array($response) && isset($response['notFound']) && $response['notFound'] === true)
+        {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Такой цвет не был найден',
+            ],404);
+        }
 
         return $response ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно удалены'
-        ])->setStatusCode(200) : response()->json([
+        ],200) : response()->json([
             "status" => 0,
             'message' => 'Ошибка, данные не были удалены'
-        ])->setStatusCode(500);
+        ],500);
     }
 
     public function destroy(Request $request, ColorsRepository $repository)
@@ -118,7 +132,7 @@ class ColorsController extends Controller
             return response()->json([
                 'status' => 0,
                 'message' => 'Данные не найдены'
-            ])->setStatusCode(404);
+            ],404);
         }
 
         $response = $repository->destroy($ids);
@@ -126,10 +140,10 @@ class ColorsController extends Controller
         return ($response !== null && $response !== false) ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно удалены'
-        ])->setStatusCode(201) : response()->json([
+        ],200) : response()->json([
             'status' => 0,
             'message' => 'Ошибка при удалении данных'
-        ])->setStatusCode(500);
+        ],500);
        
     }
     

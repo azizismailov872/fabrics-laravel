@@ -3,9 +3,9 @@
 namespace App\Models\Colors;
 
 use App\Models\Fabrics\Fabric;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Color extends Model
 {
@@ -16,14 +16,14 @@ class Color extends Model
     protected $guarded = [];
 
 
-    public function fabrics(): BelongsToMany
+    public function fabrics(): BelongsTo
     {
-        return $this->belongsToMany(Fabric::class,'fabrics_colors','color_id','fabric_id');
+        return $this->belongsTo(Fabric::class);
     }
 
     protected static function booted () {
         static::deleting(function(Color $color) { 
-             $color->fabrics()->detach();
+            Fabric::where('color_id',$color->id)->update(['color_id' => null]);
         });
     }
 }

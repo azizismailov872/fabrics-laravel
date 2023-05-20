@@ -22,7 +22,7 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:300|unique:colors,name,'.$this->id,
+            'name' => 'required|min:4|max:300|unique:colors,name,'.$this->id,
             'hex_code' => 'max:300'
         ];
     }
@@ -32,6 +32,7 @@ class UpdateRequest extends FormRequest
         return [
             'name.required' => 'Введите название цвета',
             'name.max' => 'Слишком длинное название',
+            'name.min' => 'Введите минимум 4 символа в названии',
             'name.unique' => 'Такой цвет уже существует',
             'max' => 'Слишком длинное '
         ];

@@ -16,18 +16,16 @@ class ColorsRepository {
     public function get($sort = 'asc',$pageSize = 30,$filters = null)
     {   
         $this->query = Color::query();
+
         if(isset($filters) && !empty($filters)) {
-            
             foreach($filters as $filter => $filterValue) {
                 if(method_exists($this,$filter)) {
                     $this->$filter($filterValue);
                 }
             }
-
         }
 
-        return $this->query->orderBy('name',$sort)->paginate($pageSize);
-           
+        return $this->query->orderBy('name',$sort)->paginate($pageSize);  
     }
 
     public function list()
@@ -38,6 +36,7 @@ class ColorsRepository {
     public function create($data)
     {   
         if(!isset($data) && empty($data)) return null;
+
         $color =  Color::create($data);
 
         return (isset($color) && !empty($color)) ? $color : null;
@@ -61,10 +60,7 @@ class ColorsRepository {
         $color = Color::find($id);
 
         if(!isset($color) && empty($color)) {
-            return [
-                'status' => 0,
-                'message' => 'Такой цвет не найден'
-            ];
+            return ['notFound' => true];
         }
 
         return $color->delete($id);
