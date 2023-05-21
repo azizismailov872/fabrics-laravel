@@ -30,7 +30,7 @@ class ColorsRepository {
 
     public function list()
     {
-        return Color::select(['id','name'])->get()->toArray();
+        return Color::select(['id','name'])->orderBy('id','desc')->get()->toArray();
     }
 
     public function create($data)
