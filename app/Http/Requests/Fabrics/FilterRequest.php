@@ -24,10 +24,13 @@ class FilterRequest extends FormRequest
         return [
             'model' => 'sometimes|string|max:500',
             'quantity' => 'sometimes|integer|min:0',
-            'materials' => 'sometimes|string|max:1000',
-            'colors' => 'sometimes|string|max:1500',
+            'weight' => 'sometimes|integer|min:0',
+            'material_id' => 'sometimes|integer|exists:materials,id',
+            'color_id' => 'sometimes|integer|exists:colors,id',
             'quantity_from' => 'sometimes|integer|min:0|max:100000',
             'quantity_to' => 'sometimes|integer|min:1|max:100000',
+            'weight_from' => 'sometimes|integer|min:0|max:100000',
+            'weight_to' => 'sometimes|integer|min:1|max:100000',
         ];
     }
 
@@ -38,14 +41,20 @@ class FilterRequest extends FormRequest
             'model.max' => 'Слишком длинное название',
             'quantity.integer' => 'Поле колличество должно быть числом !',
             'quantity.min' => 'Минимальное колличество должно быть не меньше нуля',
+            'weight.integer' => 'Поле вес должно быть числом !',
+            'weight.min' => 'Минимальный вес должен быть не меньше нуля',
             'quantity_from.min' => 'Минимальное колличество должно быть не меньше нуля',
             'quantity_from.max' => 'Слишком большое колличество',
             'quantity_to.min' => 'Минимальное колличество должно быть не меньше 1',
             'quantity_to.max' => 'Слишком большое колличество',
-            'materials.string' => 'Поле материалы должно быть строкой',
-            'materials.max' => 'Слишком длинный запрос',
-            'colors.string' => 'Поле цвета должно быть строкой',
-            'colors.max' => 'Слишком длинный запрос',
+            'weight_from.min' => 'Минимальный вес должен быть не меньше нуля',
+            'weight_from.max' => 'Слишком большой вес',
+            'weight_to.min' => 'Минимальный вес должен быть не меньше 1',
+            'weight_to.max' => 'Слишком большой вес',
+            'material_id.integer' => 'Выберите материал из списка',
+            'material_id.exists' => 'Такого материала не существует в базе',
+            'color_id.integer' => 'Выберите цвет из списка',
+            'color_id.exists' => 'Такого материала не существует в базе',
         ];
     }
 }

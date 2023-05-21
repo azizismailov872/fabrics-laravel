@@ -13,9 +13,7 @@ class FabricsController extends Controller
 {
     public function get(FilterRequest $request,FabricsRepository $repository)
     {   
-        $defaultSort = 'created_at';
-
-        $sortBy = $request->sortBy ? $request->sortBy : $defaultSort;
+        $sortBy = $request->sortBy ? $request->sortBy : 'created_at';
 
         $sort = $request->sort ? $request->sort : 'desc';
 
@@ -34,22 +32,22 @@ class FabricsController extends Controller
             'last_page' => $fabrics->lastPage(),
             'from' => $fabrics->firstItem(),
             'to' => $fabrics->lastItem(),
-        ])->setStatusCode(200);
+        ],200);
     }
 
     public function one(FabricsRepository $repository, $id)
     {
-        $fabric = $repository->one($id,true);
+        $fabric = $repository->one($id,true,true);
         
         return isset($fabric) ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно получены',
             'data' => $fabric
-        ])->setStatusCode(201) : response()->json([
+        ],200): response()->json([
             'status' => 0,
-            'message' => 'Данные не были найдены',
+            'message' => 'Такая модель не была найдена',
             'data' => $fabric
-        ])->setStatusCode(404);
+        ],404);
     }
 
     public function create(CreateRequest $request,FabricsRepository $repository)
@@ -61,30 +59,32 @@ class FabricsController extends Controller
         return isset($fabric) ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно сохранены',
-        ])->setStatusCode(201) : response()->json([
+        ],201) : response()->json([
             "status" => 0,
             'message' => 'Ошибка при сохранении данных'
-        ])->setStatusCode(500);
+        ],500);
     }
 
     public function update(UpdateRequest $request, FabricsRepository $repository, $id)
     {   
         $updatedData = $request->validated();
-
-        if(!isset($updatedData) && empty($updatedData)) return response()->json([
-            'status' => 0,
-            'message' => 'Введите данные'
-        ])->setStatusCode(422);
         
         $response = $repository->update($id,$updatedData);
+
+        if(is_null($response)) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Такая модель не найдена'
+            ],404);
+        }
 
         return $response ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно обновлены'
-        ])->setStatusCode(200) : response()->json([
+        ],200) : response()->json([
             'status' => 0,
             'message' => 'Ошибка при сохранении данных'
-        ])->setStatusCode(500);
+        ],500);
 
     }
 
@@ -92,15 +92,18 @@ class FabricsController extends Controller
     {
         $response = $repository->delete($id);
 
-        if(is_array($response)) return response()->json($response);
+        if(is_null($response)) return response()->json([
+            'status' => 0,
+            'message' => 'Такая модель не найдена'
+        ],404);
 
         return $response ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно удалены'
-        ])->setStatusCode(200) : response()->json([
+        ],200) : response()->json([
             "status" => 0,
             'message' => 'Ошибка, данные не были удалены'
-        ])->setStatusCode(500);
+        ],500);
     }
 
     public function destroy(Request $request, FabricsRepository $repository)
@@ -123,10 +126,10 @@ class FabricsController extends Controller
         return ($response !== null && $response !== false) ? response()->json([
             'status' => 1,
             'message' => 'Данные успешно удалены'
-        ])->setStatusCode(201) : response()->json([
+        ],200) : response()->json([
             'status' => 0,
             'message' => 'Ошибка при удалении данных'
-        ])->setStatusCode(500);
+        ],500);
        
     }
 }

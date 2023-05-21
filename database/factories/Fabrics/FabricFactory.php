@@ -2,7 +2,9 @@
 
 namespace Database\Factories\Fabrics;
 
+use App\Models\Colors\Color;
 use App\Models\Fabrics\Fabric;
+use App\Models\Mateirals\Material;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class FabricFactory extends Factory
 {   
+
+    protected $count = 1;
     protected $model = Fabric::class;
     /**
      * Define the model's default state.
@@ -18,9 +22,14 @@ class FabricFactory extends Factory
      */
     public function definition(): array
     {   
+
         return [
+            //'model' => '#'.fake()->unique()->numberBetween(1,300),
+            'model' => $this->count < 10 ? '#00'.$this->count++ : '#0'.$this->count++,
             'quantity' => fake()->randomNumber(),
-            'materials' => 'Лен, Шелк',
+            'weight' =>  fake()->randomNumber(),
+            'material_id' => Material::inRandomOrder()->first()->id,
+            'color_id' =>  Color::inRandomOrder()->first()->id,
         ];
     }
 }
