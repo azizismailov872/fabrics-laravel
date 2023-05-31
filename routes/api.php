@@ -6,6 +6,7 @@ use App\Http\Controllers\Colors\ColorsController;
 use App\Http\Controllers\Fabrics\FabricsController;
 use App\Http\Controllers\Materials\MaterialsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Fabrics\FabricsLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,15 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::get('/auth',[AuthenticatedSessionController::class,'auth']);
+
+Route::controller(FabricsLogController::class)->group(function(){
+    Route::get('/fabrics/logs','get');
+    Route::get('/fabrics/logs/{id}','one');
+    Route::post('/fabrics/logs/create','create');
+    Route::post('/fabrics/logs/update/{id}','update');
+    Route::get('/fabrics/logs/delete/{id}','delete');
+    Route::post('/fabrics/logs/delete','destroy');
+});
 
 
 Route::controller(FabricsController::class)->group(function(){

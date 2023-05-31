@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->integer('quantity');
             $table->integer('weight');
-            //Время когда был вывоз моделей(тканей) (может быть любое время так как вывоз мог быть вчера, 1 неделю назад итд)
+            //Время когда был завоз моделей(тканей) (может быть любое время так как завоз мог быть вчера, 1 неделю назад итд)
             $table->dateTime('date_time');
+            $table->string('type')->nullable();
+            $table->text('message')->nullable();
             $table->integer('fabric_id')->unsigned();
             $table->integer('user_id')->nullable()->unsigned();
-            $table->text('message')->nullable();
             // Время созданя не посредсвенно записи в базе данных, не путать с полем date_time когда был завоз на склад
             $table->timestamps();
         });
